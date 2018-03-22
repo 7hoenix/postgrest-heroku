@@ -1,20 +1,3 @@
-diff --git a/docker/distro_release/Dockerfile.ubuntu b/docker/distro_release/Dockerfile.ubuntu
-index 6648481..6510d5a 100644
---- a/docker/distro_release/Dockerfile.ubuntu
-+++ b/docker/distro_release/Dockerfile.ubuntu
-@@ -1,11 +1,10 @@
--FROM ubuntu:16.04
-+FROM fpco/stack-build:lts-9.6
- 
- RUN BUILD_DEPS="curl ca-certificates build-essential" && \
-     apt-get -qq update && \
-     apt-get -qqy --no-install-recommends install \
-     $BUILD_DEPS \
-     libpq-dev && \
--    curl -sSL https://get.haskellstack.org/ | sh && \
-     apt-get -qq clean && \
-     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
- 
 diff --git a/src/PostgREST/Auth.hs b/src/PostgREST/Auth.hs
 index 3f29fa4..952c6dd 100644
 --- a/src/PostgREST/Auth.hs
