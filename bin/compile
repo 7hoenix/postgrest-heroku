@@ -60,10 +60,8 @@ ${BP_DIR}/migrate -path ${BUILD_DIR}/${DB_MIGRATE_DIR} -database ${DB_URI} up
 
 ############# DBAPI BINARY ################################
 
-BIN="${BP_DIR}/postgrest"
-
-echo "-----> Restoring cached $BIN"
-cp -R $CACHE_DIR/$BIN $BUILD_DIR
+echo "-----> Restoring cached binary"
+cp -R $CACHE_DIR/postgrest $BUILD_DIR
 
 echo "-----> Copying the config file builder"
 cp $BP_DIR/env-to-config $BUILD_DIR
@@ -71,7 +69,7 @@ chmod +x $BUILD_DIR/env-to-config
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-web: ./env-to-config ./${BIN} postgrest.conf
+web: ./env-to-config ./postgrest postgrest.conf
 EOF
 
 echo "-----> Persisting settings"
