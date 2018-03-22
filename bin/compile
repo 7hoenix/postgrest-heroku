@@ -66,20 +66,7 @@ fi
 if ver20; then
   BIN="postgrest-${POSTGREST_VER}"
 else
-  BIN="postgrest"
-fi
-FILE="postgrest-${POSTGREST_VER}"
-
-if [ ! -e $CACHE_DIR/$BIN ]; then
-  BIN_URL="http://bin.begriffs.com/dbapi/heroku/${FILE}.tar.xz"
-  if curl --output /dev/null --silent --head --fail $BIN_URL; then
-    echo "-----> Downloading and caching POSTGREST $POSTGREST_VER binary"
-    mkdir -p $CACHE_DIR
-    curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
-  else
-    echo "-----> Could not find prebuilt $BIN"
-    exit 1
-  fi
+  BIN="${BP_DIR}/postgrest"
 fi
 
 echo "-----> Restoring cached $BIN"
