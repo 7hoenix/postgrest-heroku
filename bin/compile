@@ -54,6 +54,10 @@ else
   cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
 fi
 
+############# MIGRATE #####################################
+
+${BP_DIR}/migrate -path ${BUILD_DIR}/${DB_MIGRATE_DIR} -database ${DB_URI} up
+
 ############# DBAPI BINARY ################################
 
 BIN="${BP_DIR}/postgrest"
