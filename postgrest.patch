@@ -16,7 +16,7 @@ index 6648481..6510d5a 100644
      rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
  
 diff --git a/src/PostgREST/Auth.hs b/src/PostgREST/Auth.hs
-index 3f29fa4..ce900bc 100644
+index 3f29fa4..952c6dd 100644
 --- a/src/PostgREST/Auth.hs
 +++ b/src/PostgREST/Auth.hs
 @@ -56,7 +56,7 @@ jwtClaims secret audience payload =
@@ -24,12 +24,12 @@ index 3f29fa4..ce900bc 100644
  -}
  containsRole :: JWTAttempt -> Bool
 -containsRole (JWTClaims claims) = M.member "role" claims
-+containsRole (JWTClaims claims) = M.member "https://kofi.sexy/role" claims
++containsRole (JWTClaims claims) = M.member "https://postgrest.com/role" claims
  containsRole _                  = False
  
  {-|
 diff --git a/src/PostgREST/Middleware.hs b/src/PostgREST/Middleware.hs
-index 8684430..7db5442 100644
+index 8684430..143076c 100644
 --- a/src/PostgREST/Middleware.hs
 +++ b/src/PostgREST/Middleware.hs
 @@ -40,10 +40,10 @@ runWithClaims conf eClaims app req =
@@ -37,16 +37,16 @@ index 8684430..7db5442 100644
          claimsSql = map (pgFmtEnvVar "request.jwt.claim.") [(c,unquoted v) | (c,v) <- M.toList claimsWithRole]
          setRoleSql = maybeToList $
 -          (\r -> "set local role " <> r <> ";") . toS . pgFmtLit . unquoted <$> M.lookup "role" claimsWithRole
-+          (\r -> "set local role " <> r <> ";") . toS . pgFmtLit . unquoted <$> M.lookup "https://kofi.sexy/role" claimsWithRole
++          (\r -> "set local role " <> r <> ";") . toS . pgFmtLit . unquoted <$> M.lookup "https://postgrest.com/role" claimsWithRole
          setSchemaSql = ["set schema " <> pgFmtLit (configSchema conf) <> ";"] :: [Text]
          -- role claim defaults to anon if not specified in jwt
 -        claimsWithRole = M.union claims (M.singleton "role" anon)
-+        claimsWithRole = M.union claims (M.singleton "https://kofi.sexy/role" anon)
++        claimsWithRole = M.union claims (M.singleton "https://postgrest.com/role" anon)
          anon = String . toS $ configAnonRole conf
          customReqCheck = (\f -> "select " <> toS f <> "();") <$> configReqCheck conf
    where
 diff --git a/test/Feature/AudienceJwtSecretSpec.hs b/test/Feature/AudienceJwtSecretSpec.hs
-index 35be4dd..efe9048 100644
+index 35be4dd..1e58f16 100644
 --- a/test/Feature/AudienceJwtSecretSpec.hs
 +++ b/test/Feature/AudienceJwtSecretSpec.hs
 @@ -20,13 +20,13 @@ spec = describe "test handling of aud claims in JWT" $ do
@@ -54,23 +54,28 @@ index 35be4dd..efe9048 100644
          {
            "exp": 9999999999,
 -          "role": "postgrest_test_author",
-+          "https://kofi.sexy/role": "postgrest_test_author",
++          "https://postgrest.com/role": "postgrest_test_author",
            "id": "jdoe",
            "aud": "youraudience"
          }
  
      -}
 -    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksInJvbGUiOiJwb3N0Z3Jlc3RfdGVzdF9hdXRob3IiLCJpZCI6Impkb2UiLCJhdWQiOiJ5b3VyYXVkaWVuY2UifQ.fJ4tLKSmolWGWehWN20qiU9dMO-WY0RI2VvacL7-ZGo"
-+    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksImh0dHBzOi8va29maS5zZXh5L3JvbGUiOiJwb3N0Z3Jlc3RfdGVzdF9hdXRob3IiLCJpZCI6Impkb2UiLCJhdWQiOiJ5b3VyYXVkaWVuY2UifQ.M3A8agB2l7Etck9YZMm1OR3ql7-VakUBQc1pzYTNxIU"
++    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksImh0dHBzOi8vcG9zdGdyZXN0LmNvbS9yb2xlIjoicG9zdGdyZXN0X3Rlc3RfYXV0aG9yIiwiaWQiOiJqZG9lIiwiYXVkaWVuY2UiOiJ5b3VyYXVkaWVuY2UifQ.PVQU30rE7xJ5_KwacuaVk8QgL3zF3ZDDcsCBZ3jC5-Y"
      request methodGet "/authors_only" [auth] ""
        `shouldRespondWith` 200
  
-@@ -39,9 +39,9 @@ spec = describe "test handling of aud claims in JWT" $ do
+@@ -35,13 +35,13 @@ spec = describe "test handling of aud claims in JWT" $ do
+ 
+         {
+           "exp": 9999999999,
+-          "role": "postgrest_test_author",
++          "https://postgrest.com/role": "postgrest_test_author",
            "id": "jdoe"
          }
      -}
 -    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksInJvbGUiOiJwb3N0Z3Jlc3RfdGVzdF9hdXRob3IiLCJpZCI6Impkb2UifQ.Dpss-QoLYjec5OTsOaAc3FNVsSjA89wACoV-0ra3ClA"
-+    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksImh0dHBzOi8va29maS5zZXh5L3JvbGUiOiJwb3N0Z3Jlc3RfdGVzdF9hdXRob3IiLCJpZCI6Impkb2UifQ.PJLrszyJw5TClpuk-fU5LefyNzkPb_98u5VbdwZvgT8"
++    let auth = authHeaderJWT "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjk5OTk5OTk5OTksImh0dHBzOi8vcG9zdGdyZXN0LmNvbS9yb2xlIjoicG9zdGdyZXN0X3Rlc3RfYXV0aG9yIiwiaWQiOiJqZG9lIn0.Z43m-PNgYUzPFFC8WZAjpmqcttqOTe7awvK1IlLzMF0"
      request methodGet "/authors_only" [auth] ""
        `shouldRespondWith` 200
  
@@ -79,7 +84,7 @@ index 35be4dd..efe9048 100644
 \ No newline at end of file
 +    get "/has_count_column" `shouldRespondWith` 200 
 diff --git a/test/Feature/QuerySpec.hs b/test/Feature/QuerySpec.hs
-index 86b9a1a..25c00a9 100644
+index 86b9a1a..524b221 100644
 --- a/test/Feature/QuerySpec.hs
 +++ b/test/Feature/QuerySpec.hs
 @@ -769,7 +769,7 @@ spec = do
@@ -87,7 +92,7 @@ index 86b9a1a..25c00a9 100644
      it "current role is available as GUC claim" $
        request methodPost "/rpc/get_guc_value" []
 -          [json| { "name": "request.jwt.claim.role" } |]
-+          [json| { "name": "request.jwt.claim.https://kofi.sexy/role" } |]
++          [json| { "name": "request.jwt.claim.https://postgrest.com/role" } |]
            `shouldRespondWith`
            [str|"postgrest_test_anonymous"|]
            { matchStatus  = 200

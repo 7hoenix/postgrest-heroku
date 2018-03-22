@@ -1,17 +1,7 @@
 ## Postgrest on Heroku
 
 > [postgrest.patch](./postgrest.patch) describes the changes that make the `role`
-> claim Auth0-compatible. After applying that diff, you can build the new binary:
->
-> ```
-> docker build --rm=false -t postgrest:latest -f docker/distro_release/Dockerfile.ubuntu docker/distro_release/
-> docker run -it \
->   -v .tmp/stack:/root/.stack \
->   -v $(pwd):/source \
->   -v .tmp/bin/:/root/.local/bin/ \
->   --ulimit nofile=98304:98304 \
->   postgrest:latest build --allow-different-user --copy-bins
-> ```
+> claim Auth0-compatible.
 
 
 The best way to build an API, now for Heroku.
