@@ -61,7 +61,8 @@ ${BP_DIR}/migrate -path ${BUILD_DIR}/${DB_MIGRATE_DIR} -database ${DB_URI} up
 ############# DBAPI BINARY ################################
 
 echo "-----> Restoring cached binary"
-cp -R $CACHE_DIR/postgrest $BUILD_DIR
+cp -R $CACHE_DIR/postgrest $BUILD_DIR # TODO: delete?
+cp $BP_DIR/postgrest $BUILD_DIR
 
 echo "-----> Copying the config file builder"
 cp $BP_DIR/env-to-config $BUILD_DIR
